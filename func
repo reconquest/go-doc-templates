@@ -20,8 +20,10 @@
         {{- ", " }}
     {{- end }}
 
-    {{- (index $param.Names 0).Name }} {{ $_cyan }}
-    {{- $param.Type | node $ }}{{ $_reset }}
+    {{- if $param.Names }}
+        {{- (index $param.Names 0).Name }} {{ $_cyan }}
+        {{- $param.Type | node $ }}{{ $_reset }}
+    {{- end }}
 {{- end }})
 
 {{- if .Decl.Type.Results }}

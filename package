@@ -70,8 +70,12 @@
         {{- end }}
 
         {{- with .Vars }}
+           {{- "\n" }}
            {{- range . }}
+                {{- "\n" }}
+                {{- $_yellow}}
                 {{- node $ .Decl }}
+                {{- $_reset }}
 
                 {{- if .Doc }}
                     {{- "\n" }}
@@ -143,11 +147,11 @@
                     {{- end }}
 
                     {{- range $name := .Names }}
-                    {{- "\n" }}
-                    {{- $_dark_gray }}
-                    {{- example_text $ .Name "     " }}
-                    {{- $_reset }}
-                    {{- end }}
+                        {{- "\n" }}
+                        {{- $_dark_gray }}
+                        {{- example_text $ .Name "     " }}
+                        {{- $_reset }}
+                        {{- end }}
                     {{- end }}
                 {{- end }}
 
