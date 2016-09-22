@@ -13,7 +13,7 @@ Template files for **go doc** utility.
 # Usage
 
 ```
-godoc --templates go-doc-templates builtin 
+# godoc --templates go-doc-templates builtin 
 ```
 
 ![screenshot](http://i.imgur.com/VLRRCie.png)
