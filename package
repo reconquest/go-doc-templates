@@ -1,0 +1,217 @@
+{{- $_reset := "\033[0m" }}
+{{- $_bold := "\033[1m" }}
+{{- $_red := "\033[31m" }}
+{{- $_green := "\033[32m" }}
+{{- $_yellow := "\033[33m" }}
+{{- $_blue := "\033[34m" }}
+{{- $_magenta := "\033[35m" }}
+{{- $_cyan := "\033[36m" }}
+{{- $_light_gray := "\033[37m" }}
+{{- $_dark_gray := "\033[90m" }}
+{{- $_light_red := "\033[91m" }}
+{{- $_light_green := "\033[92m" }}
+{{- $_light_yellow := "\033[93m" }}
+{{- $_light_blue := "\033[94m" }}
+{{- $_light_magenta := "\033[95m" }}
+{{- $_light_cyan := "\033[96m" }}
+{{- $_white := "\033[97m" }}
+{{- $info := . }}
+{{- $filtered := .IsFiltered }}
+{{- if $filtered }}
+     {{- range .PAst }}
+          {{- range .Decls }}
+          {{- node $info . }}
+     {{- end }}
+{{- end }}
+{{- else }}
+     {{- with .PAst }}
+          {{- range $filename, $ast := . }}
+               {{- $filename }}:
+               {{- node $ $ast }}
+          {{- end }}
+     {{- end }}
+{{- end }}
+{{- if and $filtered (not (or .PDoc .PAst)) }}
+    {{- "No match found." }}
+{{- end }}
+{{- with .PDoc }}
+    {{- if $.IsMain }}COMMAND DOCUMENTATION
+        {{- comment_text .Doc "   " "\t" }}
+    {{- else }}
+        {{- if not $filtered -}}
+            {{- $_red }}package {{ $_bold }}{{- .Name }}{{- $_reset }}
+
+            {{- $_red }}{{"\n\n" }}import "{{- $_bold }}{{.ImportPath }}{{- $_reset }}{{- $_red }}"{{- $_reset }}
+
+            {{- "\n" }}
+            {{- $_dark_gray }}
+            {{- comment_text .Doc "     " "\t" }}
+            {{- "\n" }}
+            {{- example_text $ "" "     " }}
+            {{- $_reset }}
+        {{- end }}
+
+        {{- with .Consts }}
+            {{- "\n" }}
+
+            {{- range . }}
+                {{- "\n" }}
+                {{- $_light_green }}
+                {{- node $ .Decl }}
+                {{- $_reset }}
+
+                {{- if .Doc }}
+                    {{- "\n" }}
+                    {{- $_dark_gray }}
+                    {{- comment_text .Doc "    " "\t" }}
+                    {{- $_reset }}
+                {{- end }}
+            {{- end }}
+        {{- end }}
+
+        {{- with .Vars }}
+           {{- range . }}
+                {{- node $ .Decl }}
+
+                {{- if .Doc }}
+                    {{- "\n" }}
+                    {{- $_dark_gray }}
+                    {{- comment_text .Doc "    " "\t" }}
+                    {{- $_reset }}
+                {{- end }}
+           {{- end }}
+        {{- end }}
+
+        {{- with .Funcs }}
+            {{- "\n" }}
+            {{- range . }}
+                __FUNC__
+
+                {{- "\n" }}
+                {{- $_dark_gray }}
+                {{- example_text $ .Name "     " }}
+                {{- $_reset }}
+            {{- end }}
+        {{- end }}
+
+        {{- with .Types }}
+            {{- "\n" }}
+            {{- range . }}
+                {{- "\n" }}
+
+                {{- $tname := .Name }}
+
+                {{- $_light_cyan }}
+                {{- node $ .Decl }}
+                {{- $_reset }}
+
+                {{- if .Doc }}
+                    {{- "\n" }}
+                    {{- $_dark_gray }}
+                    {{- comment_text .Doc "    " "\t" }}
+                    {{- $_reset }}
+                {{- else }}
+                    {{- "\n" }}
+                {{- end }}
+
+                {{- if .Consts }}
+                    {{- "\n" -}}
+                    {{ range .Consts }}
+                        {{- $_light_green }}
+                        {{- node $ .Decl }}
+                        {{- $_reset }}
+
+                        {{- if .Doc }}
+                            {{- "\n" }}
+                            {{- $_dark_gray }}
+                            {{- comment_text .Doc "    " "\t" }}
+                            {{- $_reset }}
+                        {{- end }}
+                    {{- end }}
+                {{- end }}
+
+                {{- if .Vars }}
+                    {{- "\n" }}
+                    {{- range .Vars }}
+                    {{- node $ .Decl }}
+
+                    {{- if .Doc }}
+                       {{- "\n" }}
+                       {{- $_dark_gray }}
+                       {{- comment_text .Doc "    " "\t" }}
+                       {{- $_reset }}
+                    {{- end }}
+
+                    {{- range $name := .Names }}
+                    {{- "\n" }}
+                    {{- $_dark_gray }}
+                    {{- example_text $ .Name "     " }}
+                    {{- $_reset }}
+                    {{- end }}
+                    {{- end }}
+                {{- end }}
+
+                {{- if .Funcs }}
+                    {{- "\n" }}
+                    {{- range .Funcs }}
+                        __FUNC__
+
+                        {{- "\n" }}
+                        {{- $_dark_gray }}
+                        {{- example_text $ .Name "     " }}
+                        {{- $_reset }}
+                    {{- end }}
+                {{- end }}
+
+                {{- if and 0 .Methods }}
+                    {{- range .Methods }}
+                        __FUNC__
+
+                        {{- "\n" }}
+                        {{- $_dark_gray }}
+                        {{- $name := printf "%s_%s" $tname .Name }}
+                        {{- example_text $ $name "     " }}
+                        {{- $_reset }}
+                    {{- end }}
+                {{- end }}
+            {{- end }}
+        {{- end }}
+
+        {{- if and $filtered (not (or .Consts (or .Vars (or .Funcs .Types)))) }}
+            {{- "No match found." }}
+        {{- end }}
+    {{- end }}
+
+    {{- with $.Notes }}
+        {{- range $marker, $content := . }}
+            {{$marker }}
+            {{- range $content }}
+                {{- comment_text .Body "      " "\t" }}
+            {{- end }}
+        {{- end }}
+    {{- end }}
+{{- end }}
+{{- if not $filtered }}
+    {{- with .Dirs }}
+        {{- "\n" }}
+        {{- $_bold }}SUBDIRECTORIES{{- $_reset }}
+
+        {{- "\n" }}
+
+        {{- if $.DirFlat }}
+            {{- range .List }}
+                {{- if .HasPkg }}
+                    {{- "\n" }}
+                    {{- $_bold }}{{ .Path }}{{- $_reset }}
+                {{- end }}
+            {{- end }}
+        {{- else }}
+            {{- range .List }}
+                {{- "\n" }}
+                {{- $_bold }}
+                {{- repeat `. ` .Depth }}{{.Name }}
+                {{- $_reset }}
+            {{- end }}
+        {{- end }}
+    {{- end }}
+{{- end }}

@@ -1,0 +1,47 @@
+{{- "\n" }}
+
+{{- $_bold }}{{- $_yellow }}func {{ $_reset }}
+
+{{- if .Decl.Recv }}
+    {{- $_bold }}({{- $_cyan }}
+
+    {{- index (index .Decl.Recv.List 0).Type | node $ }}
+    {{- $_reset }}
+
+    {{- $_bold }}) {{ $_reset }}
+{{- end }}
+
+{{- $_bold }}{{ $_magenta }}
+{{- .Decl.Name }}
+{{- $_reset }}(
+
+{{- range $index, $param := .Decl.Type.Params.List }}
+    {{- if gt $index 0 }}
+        {{- ", " }}
+    {{- end }}
+
+    {{- (index $param.Names 0).Name }} {{ $_cyan }}
+    {{- $param.Type | node $ }}{{ $_reset }}
+{{- end }})
+
+{{- if .Decl.Type.Results }}
+    {{- if gt 1 (len .Decl.Type.Results.List) }} (
+        {{- range $index, $param := .Decl.Type.Results.List }}
+            {{- if gt $index 0 }}, {{ end }}
+
+            {{- if gt 0 (len $param.Names) }}
+                {{- (index $param.Names 0).Name }}
+                {{- " " }}
+            {{- end }}
+
+            {{- $_cyan }}{{ $param.Type | node $ }}{{ $_reset }}
+        {{- end }}
+    {{- end }}
+{{- end }}
+
+{{- if .Doc }}
+    {{- "\n" }}
+    {{- $_dark_gray }}
+    {{- comment_text .Doc "    " "\t" }}
+    {{- $_reset }}
+{{- end }}
